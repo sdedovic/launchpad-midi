@@ -1,5 +1,6 @@
 package com.dedovic.controller;
 
+import com.dedovic.midi.transmitter.ColorTransmitter;
 import com.dedovic.midi.receiver.MidiDumpReceiver;
 
 import javax.sound.midi.MidiDevice;
@@ -22,7 +23,9 @@ public class Arp implements MidiDevice {
     public Arp() {
         info = new ArpInfo("Arp", "dedovic", "Java Midi Arp", "0.1.0");
 
+        transmitter = new ColorTransmitter();
         receiver = new MidiDumpReceiver();
+
     }
 
     @Override
