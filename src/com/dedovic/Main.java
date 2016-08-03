@@ -1,5 +1,8 @@
 package com.dedovic;
 
+import com.dedovic.controller.Arp;
+import com.dedovic.midi.receiver.MidiDumpReceiver;
+
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
@@ -8,13 +11,14 @@ import java.io.IOException;
 
 public class Main {
 
-    public static final String DEVICE_NAME = "Launchpad S";
+    private static final String DEVICE_NAME = "Launchpad S";
 
     private static MidiDevice device;
 
     public static void main(String[] args) {
         MidiDevice.Info[] deviceInfo = MidiSystem.getMidiDeviceInfo();
 
+        // find launchpad midi device
         for (MidiDevice.Info info: deviceInfo) {
             if (info.getName().equals(DEVICE_NAME)) {
                 try {
@@ -24,16 +28,18 @@ public class Main {
                     System.out.println("Press Enter to exit");
                 } catch (MidiUnavailableException e) {
                     System.out.println("Unable to connect to " + info.getName());
+                } finally {
+                    System.out.println("======================");
                 }
-                System.out.println("======================");
                 break;
             }
         }
-
         if (device != null && device.isOpen()) {
             try {
+                // route midi so that launchpad out -> arp in -> stdout
+                Arp arp = new Arp();
                 Transmitter transmitter = device.getTransmitter();
-                transmitter.setReceiver(new Printer());
+                transmitter.setReceiver(arp.getReceiver()); 
             } catch (MidiUnavailableException e) {
                 e.printStackTrace();
             }
@@ -41,8 +47,12 @@ public class Main {
                 System.in.read();
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                System.out.println("Exiting program");
+                device.close();
             }
-            device.close();
+        } else {
+            System.out.println("Unable to find" + DEVICE_NAME);
         }
     }
 }
