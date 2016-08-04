@@ -2,7 +2,9 @@ package com.dedovic;
 
 import com.dedovic.midi.MidiDeviceConfiguration;
 import com.dedovic.midi.MidiLaunchpad;
-import com.dedovic.midi.link.RandomColor;
+import com.dedovic.midi.component.MidiComponent;
+import com.dedovic.midi.component.impl.MidiDumpComponent;
+import com.dedovic.midi.component.impl.RandomVelocityComponent;
 
 import javax.sound.midi.MidiUnavailableException;
 
@@ -11,9 +13,12 @@ public class Main {
         try {
             MidiLaunchpad launchpad = new MidiLaunchpad(MidiDeviceConfiguration.autodetect());
 
-            RandomColor randomColor = new RandomColor();
+            MidiComponent randomColor = new RandomVelocityComponent();
             randomColor.setReceiver(launchpad.getReceiver());
-            launchpad.getTransmitter().setReceiver(randomColor);
+            MidiComponent dump = new MidiDumpComponent();
+            dump.pipe(randomColor);
+
+            launchpad.getTransmitter().setReceiver(dump);
 
         } catch (MidiUnavailableException e) {
             e.printStackTrace();

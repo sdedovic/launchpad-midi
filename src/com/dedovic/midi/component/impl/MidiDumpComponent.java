@@ -1,20 +1,22 @@
-package com.dedovic.midi.receiver;
+package com.dedovic.midi.component.impl;
 
 
 import com.dedovic.midi.MidiUtils;
+import com.dedovic.midi.component.MidiComponent;
 
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Transmitter;
 
-public class MidiDumpReceiver implements Receiver {
+public class MidiDumpComponent extends MidiComponent {
 
     @Override
-    public void send(MidiMessage message, long timeStamp) {
+    public MidiMessage transform(MidiMessage message) {
         if (message instanceof ShortMessage) {
             System.out.println(decodeShortMessage((ShortMessage) message));
         }
+        return message;
     }
 
     private String decodeShortMessage(ShortMessage message) {
@@ -28,11 +30,6 @@ public class MidiDumpReceiver implements Receiver {
                 break;
         }
         return message.getChannel() + " " + response;
-    }
-
-    @Override
-    public void close() {
-
     }
 }
 

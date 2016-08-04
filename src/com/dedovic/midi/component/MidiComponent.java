@@ -1,17 +1,18 @@
-package com.dedovic.midi;
+package com.dedovic.midi.component;
 
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.Transmitter;
 
-public class Passthrough implements Transmitter, Receiver {
+public abstract class MidiComponent implements Receiver, Transmitter {
     private Receiver receiver;
     private boolean isCosed;
 
     @Override
     public void send(MidiMessage message, long timeStamp) {
         if(receiver != null) {
-            receiver.send(message, timeStamp);
+            MidiMessage outMessage = transform(message);
+            receiver.send(outMessage, timeStamp);
         }
     }
 
@@ -28,5 +29,12 @@ public class Passthrough implements Transmitter, Receiver {
     @Override
     public void close() {
         isCosed = true;
+    }
+
+    public abstract MidiMessage transform(MidiMessage message);
+
+    public MidiComponent pipe(MidiComponent component) {
+        setReceiver(component);
+        return component;
     }
 }
